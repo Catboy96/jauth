@@ -1,6 +1,6 @@
 # jauth
 Command-line web authentication utility for Joywise.  
-[中文説明](https://github.com/CYRO4S/jauth/blob/master/README.md)
+[中文説明](https://github.com/CYRO4S/jauth/blob/master/README_zh-hant.md)
 
 ## Quick Start
 1. Download `jauth.py` and make it executable.  
