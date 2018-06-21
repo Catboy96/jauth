@@ -3,6 +3,10 @@
 import argparse
 import os
 import configparser
+import requests
+import getpass
+import json
+from bs4 import BeautifulSoup
 
 __VERSION__ = '1.0.0'
 
@@ -14,6 +18,11 @@ def bootstrap():
     # jauth connect
     parser_connect = subparsers.add_parser('connect', aliases=['con'], help='Do the web authentication.')
     parser_connect.set_defaults(func=do_connect)
+
+    # jauth disconnect
+    parser_disconnect = subparsers.add_parser('disconnect', aliases=['dis'], help='De-authenticate and disconnect from'
+                                                                                  'Internet.')
+    parser_disconnect.set_defaults(func=do_disconnect)
 
     # jauth account
     parser_account = subparsers.add_parser('account', aliases=['acc'], help='Set-up the account for authentication.')
@@ -51,6 +60,84 @@ def do_account(args):
 
 
 def do_connect(args):
+
+    # Redirect to authentication page
+    print('(1/4) Redirecting to authentication page...')
+    session = requests.Session()
+    rdr = session.get('http://cdn.ralf.ren/res/portal.html').text
+    if rdr == "Success":
+        print("Internet is available. No authentication needed.")
+        exit(1)
+    rdr_url = rdr[32:-12]
+    auth_page = session.get(rdr_url)
+
+    # Gather form data for authentication
+    print('(2/4) Gathering form data for authentication...')
+    parser = BeautifulSoup(auth_page.text, 'html.parser')
+
+    data_mac = parser.select('input[id="mac"]')[0].get('value')
+    data_wlanacname = parser.select('input[id="wlanacname"]')[0].get('value')
+    data_url = parser.select('input[id="url"]')[0].get('value')
+    data_nasip = parser.select('input[id="nasip"]')[0].get('value')
+    data_wlanuserip = parser.select('input[id="wlanuserip"]')[0].get('value')
+
+    data_username = ''
+    data_pwd = ''
+    config_file = os.path.join(os.path.expanduser('~'), ".jauth_config")
+    if not os.path.exists(config_file):
+        data_username = input('----- Account for authentication:')
+        data_pwd = getpass.getpass('----- Password of the account:')
+    else:
+        ini = configparser.ConfigParser()
+        ini.read(config_file)
+        data_username = ini.get('account', 'username')
+        data_pwd = ini.get('account', 'password')
+
+    form_data = {
+        "qrCodeId": "请输入编号",
+        "username": data_username,
+        "pwd": data_pwd,
+        "validCode": "验证码",
+        "validCodeFlag": "false",
+        "ssid": "",
+        "mac": data_mac,
+        "t": "wireless-v2",
+        "wlanacname": data_wlanacname,
+        "url": data_url,
+        "nasip": data_nasip,
+        "wlanuserip": data_wlanuserip
+    }
+
+    data_cookies = auth_page.cookies.get('JSESSIONID')
+
+    cookies_data = {
+        'JSESSIONID': data_cookies,
+        'failCounter': '0'
+    }
+
+    # Sending authentication information
+    print('(3/4) Sending authentication information...')
+    host = rdr_url[7:].split('/')[0]
+    str_return = session.post('http://%s/zportal/login/do' % host, data=form_data, cookies=cookies_data)
+    json_return = json.loads(str_return.text)
+    if not json_return['result'] == 'success':
+        print('----- Failed.')
+        print(json_return)
+        exit(2)
+
+    # Saving current session
+    print('(4/4) Saving current session...')
+    ini = configparser.ConfigParser()
+    ini.read(config_file)
+    ini['last'] = {'url': rdr_url}
+    with open(config_file, 'w') as f:
+        ini.write(f)
+
+    # Done
+    print('Connected.')
+
+
+def do_disconnect():
     pass
 
 

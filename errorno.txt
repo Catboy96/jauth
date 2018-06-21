@@ -1,0 +1,2 @@
+1: Internet is available. No need to authenticate.
+2: Authentication failed.
