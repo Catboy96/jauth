@@ -12,6 +12,7 @@ Command-line web authentication utility for Joywise.
 
 ## Requirements
 * Machine running UNIX-like OSes, like Linux, FreeBSD and macOS. Compatible with Windows Sub-system for Linux.
+* Windows is now compatible.
 * Python 3.
 * Python 3 `requests` and `beautifulsoup4`. Install it by using `pip3 install requests beautifulsoup4`
 
