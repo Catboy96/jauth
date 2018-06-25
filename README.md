@@ -17,4 +17,4 @@ Command-line web authentication utility for Joywise.
 * Python 3 `requests` and `beautifulsoup4`. Install it by using `pip3 install requests beautifulsoup4`
 
 ## Other Information
-* Settings stores at `~/.jauth_config`.
+* Settings store at `~/.jauth_config`.
