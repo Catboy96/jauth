@@ -62,13 +62,13 @@ def do_account(args):
 def do_connect(args):
 
     # Redirect to authentication page
-    print('(1/4) Redirecting to authentication page...')
     session = requests.Session()
     rdr = session.get('http://cdn.ralf.ren/res/portal.html').text
     if rdr == "Success":
         print("Internet is available. No authentication needed.")
         exit(1)
     rdr_url = rdr[32:-12]
+    print('(1/4) Redirecting to authentication page...')
     auth_page = session.get(rdr_url)
 
     # Gather form data for authentication
