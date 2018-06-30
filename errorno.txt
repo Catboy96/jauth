@@ -1,2 +1,5 @@
 1: Internet is available. No need to authenticate.
 2: Authentication failed.
+3: Internet is unavailable. No need to de-authenticate.
+4: Configuration file not found.
+5: De-authentication failed.
