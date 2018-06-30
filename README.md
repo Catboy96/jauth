@@ -9,6 +9,8 @@ Command-line web authentication utility for Joywise.
 ```./jauth.py account [username] [password]```  
 3. Time for authentication, just do it.  
 ```./jauth.py connect```
+4. If you need to de-authenticate, use:  
+```./jauth.py disconnect```  
 
 ## Requirements
 * Machine running UNIX-like OSes, like Linux, FreeBSD and macOS. Compatible with Windows Sub-system for Linux.
