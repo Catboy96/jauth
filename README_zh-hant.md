@@ -7,7 +7,9 @@
 2. 提供賬號與密碼。  
 ```./jauth.py account [學號] [密碼]```
 3. 進行認證。  
-```./jauth.py connect```
+```./jauth.py connect```  
+4. 若需解除認證，執行：  
+```./jauth.py disconnect```  
 
 ## 前置需求
 * 類 UNIX 作業系統，如 Linux、 FreeBSD 和 macOS。 與 Windows Linux 子系統相容。
