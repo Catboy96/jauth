@@ -68,11 +68,11 @@ def do_connect(args):
         print("Internet is available. No authentication needed.")
         exit(1)
     rdr_url = rdr[32:-12]
-    print('(1/4) Redirecting to authentication page...')
+    print('(1/5) Redirecting to authentication page...')
     auth_page = session.get(rdr_url)
 
     # Gather form data for authentication
-    print('(2/4) Gathering form data for authentication...')
+    print('(2/5) Gathering form data for authentication...')
     parser = BeautifulSoup(auth_page.text, 'html.parser')
 
     data_mac = parser.select('input[id="mac"]')[0].get('value')
@@ -116,7 +116,7 @@ def do_connect(args):
     }
 
     # Sending authentication information
-    print('(3/4) Sending authentication information...')
+    print('(3/5) Sending authentication information...')
     host = rdr_url[7:].split('/')[0]
     str_return = session.post('http://%s/zportal/login/do' % host, data=form_data, cookies=cookies_data)
     json_return = json.loads(str_return.text)
@@ -125,8 +125,22 @@ def do_connect(args):
         print(json_return)
         exit(2)
 
+    # Extract session data
+    print('(4/5) Extracting session data...')
+    cookies_next = {
+        'JSESSIONID': data_cookies,
+        'username': data_username,
+        'password': data_pwd,
+        'rememberPassword': 'true',
+        'failCounter': '0',
+        'serviceId': '',
+        'userIndex': auth_page.cookies.get('userIndex')
+    }
+    # TODO: Set referrer
+    session.get('http://%s/zportal/goToAuthResult' % host, cookies=cookies_next)
+
     # Saving current session
-    print('(4/4) Saving current session...')
+    print('(5/5) Saving current session...')
     ini = configparser.ConfigParser()
     ini.read(config_file)
     ini['last'] = {'url': rdr_url}
@@ -138,7 +152,13 @@ def do_connect(args):
 
 
 def do_disconnect():
-    pass
+    # Check for Internet connection
+    session = requests.Session()
+    rdr = session.get('http://cdn.ralf.ren/res/portal.html').text
+    if not rdr == "Success":
+        print("Internet is unavailable. No need to de-authenticate.")
+        exit(3)
+
 
 
 if __name__ == '__main__':
